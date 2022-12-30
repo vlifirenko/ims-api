@@ -1,0 +1,1 @@
+java -jar target/ims-uploader-jar-with-dependencies.jar "c:/Users/matthewWork/Dropbox"

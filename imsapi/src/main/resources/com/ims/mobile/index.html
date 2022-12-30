@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html ng-app="ionicApp">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+
+    <title>IMS Api client</title>
+
+    <script src="lib/vivagraph.min.js"></script>
+
+    <link href="lib/ionic/css/ionic.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <script src="lib/ionic/js/ionic.bundle.min.js"></script>
+    <script src="lib/ionic/js/angular/angular-resource.min.js"></script>
+    <script src="script.js"></script>
+
+    <script src="lib/angular-file-upload-shim.js"></script>
+    <script src="lib/angular-file-upload.js"></script>
+
+    <script src="../src/sigma.core.js"></script>
+    <script src="../src/conrad.js"></script>
+    <script src="../src/utils/sigma.utils.js"></script>
+    <script src="../src/utils/sigma.polyfills.js"></script>
+    <script src="../src/sigma.settings.js"></script>
+    <script src="../src/classes/sigma.classes.dispatcher.js"></script>
+    <script src="../src/classes/sigma.classes.configurable.js"></script>
+    <script src="../src/classes/sigma.classes.graph.js"></script>
+    <script src="../src/classes/sigma.classes.camera.js"></script>
+    <script src="../src/classes/sigma.classes.quad.js"></script>
+    <script src="../src/classes/sigma.classes.edgequad.js"></script>
+    <script src="../src/captors/sigma.captors.mouse.js"></script>
+    <script src="../src/captors/sigma.captors.touch.js"></script>
+    <script src="../src/renderers/sigma.renderers.canvas.js"></script>
+    <script src="../src/renderers/sigma.renderers.webgl.js"></script>
+    <script src="../src/renderers/sigma.renderers.svg.js"></script>
+    <script src="../src/renderers/sigma.renderers.def.js"></script>
+    <script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+    <script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+    <script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+    <script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+    <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+    <script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+    <script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+    <script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+    <script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+    <script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+    <script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+    <script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+    <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+    <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+    <script src="../src/misc/sigma.misc.animation.js"></script>
+    <script src="../src/misc/sigma.misc.bindEvents.js"></script>
+    <script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+    <script src="../src/misc/sigma.misc.drawHovers.js"></script>
+
+    <script src="../desktop/lib/gexf-parser.js"></script>
+    <script src="../desktop/lib/sigma.parsers.gexf.js"></script>
+
+</head>
+
+<body>
+
+<div ng-controller="MainCtrl">
+    <ion-nav-view></ion-nav-view>
+    <ion-footer-bar align-title="left" class="bar-stable">IMS server v ${project.version}</ion-footer-bar>
+</div>
+
+<script id="ims-menu.html" type="text/ng-template">
+
+    <ion-side-menus>
+        <ion-side-menu-content>
+            <ion-nav-bar class="bar-positive"></ion-nav-bar>
+            <ion-nav-buttons side="left"></ion-nav-buttons>
+            <ion-nav-view name="menuContent"></ion-nav-view>
+        </ion-side-menu-content>
+    </ion-side-menus>
+
+</script>
+
+<script id="auth.html" type="text/ng-template">
+    <ion-view title="Авторизация">
+        <ion-content padding="true">
+            <form ng-submit="submit()">
+                <p style="color:red">{{errors}}</p>
+                <label class="item item-input">
+                    <input type="text" placeholder="E-mail" ng-model="auth.email">
+                </label>
+                <label class="item item-input">
+                    <input type="password" placeholder="Пароль" ng-model="auth.password">
+                </label>
+                <input type="submit" id="submit" class="button button-block button-balanced" value="Вход"/>
+                <button class="button button-block" ng-click="register()">Регистрация</button>
+            </form>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="register.html" type="text/ng-template">
+    <ion-view title="Регистрация">
+        <ion-content padding="true">
+            <form ng-submit="submit()">
+                <p style="color:red">{{errors}}</p>
+                <label class="item item-input">
+                    <input type="text" placeholder="E-mail" ng-model="register.email">
+                </label>
+                <label class="item item-input">
+                    <input type="password" placeholder="Пароль" ng-model="register.password">
+                </label>
+                <label class="item item-input">
+                    <input type="password" placeholder="Повторить пароль" ng-model="register.password2">
+                </label>
+                <input type="submit" id="submit" class="button button-block button-balanced" value="Регистрация"/>
+            </form>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="filelist.html" type="text/ng-template">
+    <ion-view title="Список файлов">
+        <ion-nav-buttons side="left">
+            <button class="button button-icon button-clear ion-network" ng-click="toGraph()"></button>
+            <button class="button button-icon button-clear ion-plus-round" ng-click="add()"></button>
+        </ion-nav-buttons>
+        <ion-nav-buttons side="right">
+            <button class="button" ng-click="exit()">Выход</button>
+        </ion-nav-buttons>
+        <ion-content padding="true">
+            <h2 ng-show="tag">Тэг: {{tag}} <i class="icon ion-ios7-close-empty" ng-click="clearTag()"></i></h2>
+            <p style="color:red">{{errors}}</p>
+            <ion-list>
+                <ion-item ng-repeat="file in filelist" item="item" href="#/ims/fileinfo/{{file.guid}}">
+                    <h2>{{file.meta.title || file.guid}}</h2>
+                    <p>{{file.created | date:'medium'}}</p>
+                </ion-item>
+            </ion-list>
+            <button ng-hide="loaded" class="button button-block button-light" ng-click="loadMore()">Загрузить еще</button>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="graph.html" type="text/ng-template">
+    <ion-view title="Граф">
+        <ion-nav-buttons side="left">
+            <button class="button button-icon button-clear ion-navicon-round" ng-click="toList()"></button>
+            <button class="button button-icon button-clear ion-plus-round" ng-click="add()"></button>
+            <button class="button button-icon button-clear ion-ios7-gear" ng-click="toSettings()"></button>
+        </ion-nav-buttons>
+        <ion-nav-buttons side="right">
+            <button class="button" ng-click="exit()">Выход</button>
+        </ion-nav-buttons>
+        <ion-content padding="true" class="full">
+            <p style="color:red">{{errors}}</p>
+
+            <div sigmagraph gr='{{graph}}'></div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="graphdir.html" type="text/ng-template">
+    <div id="graph"></div>
+</script>
+
+<script id="sigmagraphdir.html" type="text/ng-template">
+    <div id="sigmagraph"></div>
+</script>
+
+<script id="graph-settings.html" type="text/ng-template">
+    <ion-view title="Настройки графа">
+        <ion-nav-buttons side="left">
+            <button class="button button-icon button-clear ion-arrow-left-c" ng-click="back()"></button>
+        </ion-nav-buttons>
+        <ion-nav-buttons side="right">
+            <button class="button" ng-click="exit()">Выход</button>
+        </ion-nav-buttons>
+        <ion-content>
+            <div class="list">
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Минимальный диаметр круга</span>
+                    <input type="text" placeholder="" ng-model="settings.minDiam">
+                </label>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Коэффициент для диаметра круга</span>
+                    <input type="text" placeholder="" ng-model="settings.c1">
+                </label>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Минимальная сила притяжения узлов</span>
+                    <input type="text" placeholder="" ng-model="settings.minPow">
+                </label>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Коэффициент для силы притяжения узлов</span>
+                    <input type="text" placeholder="" ng-model="settings.c2">
+                </label>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Минимальна длина связи</span>
+                    <input type="text" placeholder="" ng-model="settings.minLength">
+                </label>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Коэффициент для длины связи</span>
+                    <input type="text" placeholder="" ng-model="settings.c3">
+                </label>
+            </div>
+            <div class="padding">
+                <button class="button button-block button-balanced" ng-click="save()">Сохранить</button>
+            </div>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="fileinfo.html" type="text/ng-template">
+    <ion-view title="{{fileId}}">
+        <ion-nav-buttons side="left">
+            <button class="button button-icon button-clear ion-navicon-round" ng-click="list()"></button>
+        </ion-nav-buttons>
+        <ion-content padding="true">
+            <p style="color:red">{{errors}}</p>
+
+            <h2>Мета-данные:</h2>
+            <ion-list>
+                <ion-item ng-repeat="(key, value) in metalist" item="item">
+                    {{key}}: {{value}}
+                </ion-item>
+            </ion-list>
+            <br/>
+            <button class="button button-positive" ng-click="getMeta()">Мета-файл</button>
+            <button class="button button-positive" ng-click="getFile()">Файл</button>
+
+            <button class="button button-block" ng-click="edit()">Редактировать</button>
+            <button class="button button-block" ng-click="delete()">Удалить</button>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="fileadd.html" type="text/ng-template">
+    <ion-view title="Загрузка файла">
+        <ion-content padding="true">
+            <form ng-submit="upload()">
+                <p style="color:red">{{errors}}</p>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Название&nbsp;<font color="red">*</font></span>
+                    <input type="text" ng-model="file.meta.title">
+                </label>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Тэги через запятую&nbsp;<font color="red">*</font></span>
+                    <input type="text" ng-model="file.meta.tags">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">Файл&nbsp;<font color="red">*</font></span>
+                    <input type="file" ng-file-select="onFileSelect($files)">
+                </label>
+                <input type="submit" id="submit" class="button button-block button-balanced" value="Сохранить"/>
+            </form>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="fileedit.html" type="text/ng-template">
+    <ion-view title="Редактирование файла">
+        <ion-nav-buttons side="left">
+            <button class="button button-icon button-clear ion-navicon-round" ng-click="list()"></button>
+        </ion-nav-buttons>
+        <ion-content padding="true">
+            <form ng-submit="upload()">
+                <p style="color:red">{{errors}}</p>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Название&nbsp;<font color="red">*</font></span>
+                    <input type="text" ng-model="meta.title">
+                </label>
+                <label class="item item-input item-stacked-label">
+                    <span class="input-label">Тэги через запятую&nbsp;<font color="red">*</font></span>
+                    <input type="text" ng-model="meta.tags">
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">Файл&nbsp;<font color="red">*</font></span>
+                    <input type="file" ng-file-select="onFileSelect($files)">
+                </label>
+                <input type="submit" id="submit" class="button button-block" value="Загрузить"/>
+            </form>
+        </ion-content>
+    </ion-view>
+</script>
+
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html ng-app="imsApp">
+<head>
+
+    <meta charset="utf-8">
+
+    <title>IMS Api client</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="lib/vivagraph.min.js"></script>
+
+    <script src="lib/angular.min.js"></script>
+    <script src="lib/angular-route.min.js"></script>
+    <script src="lib/angular-ui-router.min.js"></script>
+    <script src="lib/angular-resource.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <script src="lib/angular-file-upload-shim.js"></script>
+    <script src="lib/angular-file-upload.js"></script>
+
+
+</head>
+
+<body>
+
+<div ng-controller="MainCtrl" class="full">
+    <div ui-view class="full"></div>
+</div>
+
+<script id="ims-menu.html" type="text/ng-template">
+    <div id="wrap full">
+        <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+            <div class="container">
+                <div class="navbar-header">
+                    <button class="navbar-toggle collapsed" type="button" data-toggle="collapse"
+                            data-target=".bs-navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a href="#/ims/filelist" class="navbar-brand">Список файлов</a>
+                    <a href="#/ims/graph/settings" class="navbar-brand">Настройки графа</a>
+                </div>
+                <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="#/ims/fileadd">Загрузить файл</a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#/ims/logout">Выход</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <div class="container full">
+            <div class="row full">
+                <div class="col-sm-12 full">
+                    <div ui-view name="menuContent" class="full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<div class="footer">
+        <div class="container">
+            <p class="text-muted">IMS server v ${project.version}</p>
+        </div>
+    </div>-->
+</script>
+
+<script id="start-menu.html" type="text/ng-template">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-1"></div>
+            <div class="col-sm-10">
+                <div ui-view name="menuContent"></div>
+            </div>
+            <div class="col-sm-1"></div>
+        </div>
+    </div>
+    </div>
+    <!--<div class="footer">
+        <div class="container">
+            <p class="text-muted">IMS server v ${project.version}</p>
+        </div>
+    </div>-->
+</script>
+
+<script id="auth.html" type="text/ng-template">
+    <div class="page-header">
+        <h1>Авторизация</h1>
+    </div>
+    <form role="form" ng-submit="submit()">
+        <p style="color:red">{{errors}}</p>
+
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="text" class="form-control" id="email" placeholder="" ng-model="auth.email">
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" class="form-control" id="password" placeholder=""
+                   ng-model="auth.password">
+        </div>
+        <input type="submit" id="submit" class="btn btn-default btn-success btn-block" value="Вход"/>
+        <br/>
+        <button class="btn btn-default btn-block" ng-click="register()">Регистрация</button>
+    </form>
+</script>
+
+<script id="register.html" type="text/ng-template">
+    <div class="page-header">
+        <h1>Регистрация</h1>
+    </div>
+    <form role="form" ng-submit="submit()">
+        <p style="color:red">{{errors}}</p>
+
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="text" class="form-control" id="email" placeholder="" ng-model="register.email">
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" class="form-control" id="password" placeholder=""
+                   ng-model="register.password">
+        </div>
+        <div class="form-group">
+            <label for="password2">Пароль</label>
+            <input type="password" class="form-control" id="password2" placeholder=""
+                   ng-model="register.password2">
+        </div>
+        <input type="submit" id="submit" class="btn btn-default btn-block" value="Регистрация"/>
+    </form>
+</script>
+
+<script id="filelist.html" type="text/ng-template">
+    <p style="color:red">{{errors}}</p>
+    <div id="graphWrapper" graph gr='{{graph}}'></div>
+    <div id="filelist">
+        <div id="listView">
+            <ul class="list-group">
+                <li class="list-group-item" ng-repeat="file in filelist">
+                    {{$index + 1}}. {{file.meta.title || file.guid}}
+                    <div class="created">{{file.created}}</div>
+                    <div class="created">{{file.tags}}</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="clear"></div>
+</script>
+
+<script id="graphdir.html" type="text/ng-template">
+    <div id="graph"></div>
+</script>
+
+<script id="graph-settings.html" type="text/ng-template">
+    <form role="form" ng-submit="submit()">
+        <p style="color:red">{{errors}}</p>
+
+        <div class="form-group">
+            <label for="minDiam">Минимальный диаметр круга</label>
+            <input type="text" class="form-control" id="minDiam" placeholder="" ng-model="settings.minDiam">
+        </div>
+        <div class="form-group">
+            <label for="c1">Коэффициент для диаметра круга</label>
+            <input type="text" class="form-control" id="c1" placeholder=""
+                   ng-model="settings.c1">
+        </div>
+        <div class="form-group">
+            <label for="minPow">Минимальная сила притяжения узлов</label>
+            <input type="text" class="form-control" id="minPow" placeholder=""
+                   ng-model="settings.minPow">
+        </div>
+        <div class="form-group">
+            <label for="c2">Коэффициент для силы притяжения узлов</label>
+            <input type="text" class="form-control" id="c2" placeholder=""
+                   ng-model="settings.c2">
+        </div>
+        <div class="form-group">
+            <label for="minLength">Минимальна длина связи</label>
+            <input type="text" class="form-control" id="minLength" placeholder=""
+                   ng-model="settings.minLength">
+        </div>
+        <div class="form-group">
+            <label for="c3">Коэффициент для длины связи</label>
+            <input type="text" class="form-control" id="c3" placeholder=""
+                   ng-model="settings.c3">
+        </div>
+        <input type="submit" id="submit" class="btn btn-default btn-success btn-block" value="Сохранить"/>
+    </form>
+</script>
+
+</body>
+</html>

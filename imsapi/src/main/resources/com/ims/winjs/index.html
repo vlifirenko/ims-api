@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html ng-app="imsApp">
+<head>
+
+    <meta charset="utf-8">
+
+    <title>IMS Api client</title>
+
+    <link href="lib/winjs/css/ui-dark.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="../mobile/lib/vivagraph.js"></script>
+
+    <script src="lib/angular.min.js"></script>
+    <script src="lib/angular-route.min.js"></script>
+    <script src="lib/angular-ui-router.min.js"></script>
+    <script src="../mobile/lib/ionic/js/angular/angular-resource.js"></script>
+    <script src="js/script.js"></script>
+
+    <script src="../mobile/lib/angular-file-upload-shim.js"></script>
+    <script src="../mobile/lib/angular-file-upload.js"></script>
+
+</head>
+
+<body>
+
+<div ng-controller="MainCtrl" ui-view class="container"></div>
+
+<script id="ims-menu.html" type="text/ng-template">
+    <div class="sidebar">
+        <button class="win-command">
+				<span class="win-commandicon">
+					<span class="win-commandglyph"></span>
+				</span>
+            <span class="win-label">Create</span>
+        </button>
+        <button ng-click="addFile()" class="win-command">
+			<span class="win-commandicon">
+				<span class="win-commandglyph"></span>
+			</span>
+            <span class="win-label">Add</span>
+        </button>
+        <button class="win-command">
+			<span class="win-commandicon">
+				<span class="win-commandglyph"></span>
+			</span>
+            <span class="win-label">Activity</span>
+        </button>
+        <button ng-click="graphSettings()" class="win-command">
+			<span class="win-commandicon">
+				<span class="win-commandglyph"></span>
+			</span>
+            <span class="win-label">Settings</span>
+        </button>
+        <button ng-click="logout()" class="win-command">
+			<span class="win-commandicon">
+				<span class="win-commandglyph"></span>
+			</span>
+            <span class="win-label">Logout</span>
+        </button>
+    </div>
+
+    <div ui-view name="menuContent" class="main-panel"></div>
+</script>
+
+<script id="start-menu.html" type="text/ng-template">
+    <div class="container" ui-view name="menuContent"></div>
+</script>
+
+<script id="auth.html" type="text/ng-template">
+    <div class="page-header">
+        <h1>Авторизация</h1>
+    </div>
+    <form role="form" ng-submit="submit()" class="login">
+        <p style="color:red">{{errors}}</p>
+
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="text" class="form-control" id="email" placeholder="" ng-model="auth.email">
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" class="form-control" id="password" placeholder=""
+                   ng-model="auth.password">
+        </div>
+        <br/>
+        <input type="submit" id="submit" class="btn btn-default btn-success btn-block" value="Вход"/>
+        <button class="btn btn-default btn-block register" ng-click="register()">Регистрация</button>
+    </form>
+</script>
+
+<script id="register.html" type="text/ng-template">
+    <div class="page-header">
+        <h1>Регистрация</h1>
+    </div>
+    <form role="form" ng-submit="submit()" class="register">
+        <p style="color:red">{{errors}}</p>
+
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="text" class="form-control" id="email" placeholder="" ng-model="register.email">
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" class="form-control" id="password" placeholder=""
+                   ng-model="register.password">
+        </div>
+        <div class="form-group">
+            <label for="password2">Пароль</label>
+            <input type="password" class="form-control" id="password2" placeholder=""
+                   ng-model="register.password2">
+        </div>
+        <input type="submit" id="submit" class="btn btn-default btn-block" value="Регистрация"/>
+    </form>
+</script>
+
+<script id="filelist.html" type="text/ng-template">
+    <div class="win-autosuggestbox">
+        <input id="search-input" type="search" ng-model="search.text" ng-change="searchChange()"
+               class="win-autosuggestbox-input" ng-focus="showSearch()"> <!--ng-blur="hideSearch()"-->
+
+        <div id="searchbox" class="win-autosuggestbox-flyout win-searchbox-flyout" ng-show="search.text"
+             style="display: block; left: 0px; touch-action: none;">
+            <div class="win-repeater win-disposable">
+                <div class="win-autosuggestbox-suggestion-separator win-searchbox-suggestion-separator">
+                    <div title="Recommendations">Recommendations</div>
+                    <hr>
+                </div>
+                <div class="win-autosuggestbox-suggestion-result win-searchbox-suggestion-result">
+                    <div class="win-autosuggestbox-suggestion-result-text" title="Mint">
+                        <span class="win-autosuggestbox-hithighlight-span">Mint</span><br>
+                    </div>
+                </div>
+                <div class="win-autosuggestbox-suggestion-result win-searchbox-suggestion-result">
+                    <div class="win-autosuggestbox-suggestion-result-text">
+                        <span class="win-autosuggestbox-hithighlight-span">Strawberry</span><br>
+                    </div>
+                </div>
+                <div class="win-autosuggestbox-suggestion-separator win-searchbox-suggestion-separator">
+                    <div title="Search">Search</div>
+                    <hr>
+                </div>
+                <div class="win-autosuggestbox-suggestion-query win-searchbox-suggestion-query"
+                     ng-repeat="tag in tags track by $index" ng-click="selectTag(tag)">
+                    <span class="win-autosuggestbox-hithighlight-span">{{tag}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="win-searchbox-button"></div>
+    </div>
+
+    <div id="graphWrapper" graph gr='{{graph}}'></div>
+
+    <div id="filelist">
+        <div id="listView" class="win-selectionstylefilled win-disposable win-listview win-element-resize"
+             style="height: 100%">
+            <div class="win-viewport win-vertical">
+                <div style="margin-bottom:40px">
+                    <div class="smallListIconTextItem" ng-repeat="file in filelist">
+                        <div class="smallListIconTextItem-Detail">
+                            <h4>{{file.meta.title}}</h4>
+                            <h6>{{file.created}}</h6>
+                            <h6>{{file.tags}}</h6>
+                        </div>
+                    </div>
+                    <button ng-hide="loaded" class="button button-block button-light" ng-click="loadMore()">Загрузить
+                        еще
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="graphdir.html" type="text/ng-template">
+    <div id="graph" class="full"></div>
+</script>
+
+<script id="graph-settings.html" type="text/ng-template">
+    <form role="form" ng-submit="submit()">
+        <p style="color:red">{{errors}}</p>
+
+        <div class="form-group">
+            <label for="minDiam">Минимальный диаметр круга</label>
+            <input type="text" class="form-control" id="minDiam" placeholder="" ng-model="settings.minDiam">
+        </div>
+        <div class="form-group">
+            <label for="c1">Коэффициент для диаметра круга</label>
+            <input type="text" class="form-control" id="c1" placeholder=""
+                   ng-model="settings.c1">
+        </div>
+        <div class="form-group">
+            <label for="minPow">Минимальная сила притяжения узлов</label>
+            <input type="text" class="form-control" id="minPow" placeholder=""
+                   ng-model="settings.minPow">
+        </div>
+        <div class="form-group">
+            <label for="c2">Коэффициент для силы притяжения узлов</label>
+            <input type="text" class="form-control" id="c2" placeholder=""
+                   ng-model="settings.c2">
+        </div>
+        <div class="form-group">
+            <label for="minLength">Минимальна длина связи</label>
+            <input type="text" class="form-control" id="minLength" placeholder=""
+                   ng-model="settings.minLength">
+        </div>
+        <div class="form-group">
+            <label for="c3">Коэффициент для длины связи</label>
+            <input type="text" class="form-control" id="c3" placeholder=""
+                   ng-model="settings.c3">
+        </div>
+        <input type="submit" id="submit" class="btn btn-default btn-success btn-block" value="Сохранить"/>
+    </form>
+</script>
+
+<script id="add.html" type="text/ng-template">
+    <div class="page-header">
+        <h1>Добавить файл</h1>
+    </div>
+    <form role="form" ng-submit="upload()" class="login">
+        <p style="color:red">{{errors}}</p>
+
+        <div class="form-group">
+            <label for="title">Название *</label>
+            <input type="text" class="form-control" id="title" placeholder="" ng-model="file.meta.title">
+        </div>
+        <div class="form-group">
+            <label for="tags">Теги через запятую *</label>
+            <input type="text" class="form-control" id="tags" placeholder=""
+                   ng-model="file.meta.tags">
+        </div>
+        <div class="form-group">
+            <label for="file">Файл</label>
+            <input type="file" id="file" ng-file-select="onFileSelect($files)">
+        </div>
+        <br/>
+        <input type="submit" id="submit" class="btn btn-default btn-success btn-block" value="Сохранить"/>
+    </form>
+</script>
+
+</body>
+</html>

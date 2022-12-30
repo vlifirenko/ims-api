@@ -1,0 +1,101 @@
+html,
+body,
+.container,
+svg
+{
+	width: 100%;
+	height: 100%;
+}
+
+.main-panel {
+    height: 100%;
+    float: left;
+    width: 95%;
+}
+
+.sidebar {
+    height: 100%;
+    float: left;
+    width: 5%;
+	background-color: black;
+}
+
+/* login page */
+.login .form-group label {
+    width: 200px;
+    display: block;
+    float: left;
+    line-height: 45px;
+}
+
+.login .btn.register {
+    margin-left: 253px;
+}
+/* login page */
+
+/* reg page */
+.register .form-group label {
+    width: 200px;
+    display: block;
+    float: left;
+    line-height: 45px;
+}
+/* reg page */
+
+
+/* file list */
+#graphWrapper {
+    width: 50%;
+    float: left;
+    height: 100%;
+}
+
+#graphWrapper #graph
+{
+    height: 100%;
+}
+
+#filelist {
+    width: 50%;
+    float: left;
+    height: 100%;
+}
+
+.smallListIconTextItem
+{
+    width: 100%;
+    height: 70px;
+    padding: 5px;
+    overflow: hidden;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.smallListIconTextItem img.smallListIconTextItem-Image
+{
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    margin-right:20px;
+}
+
+.smallListIconTextItem .smallListIconTextItem-Detail
+{
+    margin: 5px;
+}
+/* file list */
+
+/* searchbox */
+.win-searchbox-button {
+    line-height: 31px;
+}
+
+.win-autosuggestbox {
+    width: 100%;
+}
+
+.dropdown-button:before {
+    content: "" !important;
+}
+/* searchbox */

@@ -1,0 +1,16 @@
+.idea/
+imsapi/start.bat
+imsapi/target/
+*.iml
+.svn/
+target/
+imsapi/mylog.log
+uploader/files/название.txt
+uploader/*.log*
+imsapi/src/main/resources/com/ims/files/
+imsapi/mylog.log.1
+imsapi/.classpath
+imsapi/.project
+imsapi/.settings/
+imsapi/ims-api-jar-with-dependencies/org/gephi/filters/plugin/dynamic/Bundle_ja.properties
+imsapi/ims-api-jar-with-dependencies/

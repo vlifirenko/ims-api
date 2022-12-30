@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html ng-app="imsApp">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>IMS Api client</title>
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/style.css">
+
+		<script src="../mobile/lib/vivagraph.min.js"></script>
+
+		<script src="lib/angular.min.js"></script>
+		<script src="lib/angular-route.min.js"></script>
+		<script src="lib/angular-ui-router.min.js"></script>
+		<script src="../mobile/lib/ionic/js/angular/angular-resource.js"></script>
+		<script src="../mobile/lib/angular-file-upload-shim.js"></script>
+		<script src="../mobile/lib/angular-file-upload.js"></script>
+
+        <script src="../src/sigma.core.js"></script>
+        <script src="../src/conrad.js"></script>
+        <script src="../src/utils/sigma.utils.js"></script>
+        <script src="../src/utils/sigma.polyfills.js"></script>
+        <script src="../src/sigma.settings.js"></script>
+        <script src="../src/classes/sigma.classes.dispatcher.js"></script>
+        <script src="../src/classes/sigma.classes.configurable.js"></script>
+        <script src="../src/classes/sigma.classes.graph.js"></script>
+        <script src="../src/classes/sigma.classes.camera.js"></script>
+        <script src="../src/classes/sigma.classes.quad.js"></script>
+        <script src="../src/classes/sigma.classes.edgequad.js"></script>
+        <script src="../src/captors/sigma.captors.mouse.js"></script>
+        <script src="../src/captors/sigma.captors.touch.js"></script>
+        <script src="../src/renderers/sigma.renderers.canvas.js"></script>
+        <script src="../src/renderers/sigma.renderers.webgl.js"></script>
+        <script src="../src/renderers/sigma.renderers.svg.js"></script>
+        <script src="../src/renderers/sigma.renderers.def.js"></script>
+        <script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+        <script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+        <script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+        <script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+        <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+        <script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+        <script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+        <script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+        <script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+        <script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+        <script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+        <script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+        <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+        <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+        <script src="../src/misc/sigma.misc.animation.js"></script>
+        <script src="../src/misc/sigma.misc.bindEvents.js"></script>
+        <script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+        <script src="../src/misc/sigma.misc.drawHovers.js"></script>
+
+        <script src="lib/gexf-parser.js"></script>
+        <script src="lib/sigma.parsers.gexf.js"></script>
+
+        <script src="lib/worker.js"></script>
+        <script src="lib/supervisor.js"></script>
+
+		<script src="js/script.js"></script>
+	</head>
+
+	<body>
+
+		<div ng-controller="MainCtrl" ui-view class="full"></div>
+
+		<script id="start-menu.html" type="text/ng-template">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-sm-1"></div>
+					<div class="col-sm-10">
+						<div ui-view name="mainContent"></div>
+					</div>
+					<div class="col-sm-1"></div>
+				</div>
+			</div>
+		</script>
+
+		<script id="auth.html" type="text/ng-template">
+			<h1 class="col-md-offset-3 col-md-9">Авторизация</h1>
+			<form role="form" ng-submit="submit()" class="form-horizontal">
+
+				<div class="form-group">
+					<label class="control-label col-md-offset-3 col-md-1" for="email">E-mail</label>
+					<div class="col-md-3">
+						<input type="text" class="form-control" id="email" ng-model="auth.email" required>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="control-label col-md-offset-3 col-md-1" for="password">Пароль</label>
+					<div class="col-md-3">
+						<input type="password" class="form-control" id="password" ng-model="auth.password" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-offset-4 col-md-8">
+						<input type="submit" class="btn btn-default btn-success" value="Вход"/>
+						<button class="btn btn-default" ng-click="register()">Регистрация</button>
+					</div>
+				</div>
+				<div class="form-group">
+					<p class="col-md-offset-4 col-md-8" ng-show="errors" style="color:red">{{errors}}</p>
+				</div>
+			</form>
+		</script>
+
+		<script id="register.html" type="text/ng-template">
+            <h1 class="col-md-offset-3 col-md-9">Регистрация</h1>
+			<form role="form" ng-submit="submit()" class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-md-offset-3 col-md-1" for="email">E-mail</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="email" ng-model="register.email.email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-offset-3 col-md-1" for="password">Пароль</label>
+                    <div class="col-md-3">
+                        <input type="password" class="form-control" id="password" ng-model="register.password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-offset-3 col-md-1" for="password">Пароль</label>
+                    <div class="col-md-3">
+                        <input type="password" class="form-control" id="password" ng-model="register.password2" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        <input type="submit" class="btn btn-default btn-success" value="Регистрация"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <p class="col-md-offset-4 col-md-8" ng-show="errors" style="color:red">{{errors}}</p>
+                </div>
+			</form>
+		</script>
+
+		<script id="ims-menu.html" type="text/ng-template">
+			<div class="menu-wrapper">
+				<div class="menu">
+					<div><a href="#/ims/upload"><span class="glyphicon glyphicon-upload"></span></a></div>
+					<div><a href="#/ims/create"><span class="glyphicon glyphicon-plus-sign"></span></a></div>
+					<div><a href="#/ims/activity"><span class="glyphicon glyphicon glyphicon-time"></span></a></div>
+					<div><a href="#/ims/info"><span class="glyphicon glyphicon-info-sign"></span></a></div>
+				</div>
+
+				<div class="menu menu-secondary">
+					<div><a href="#/ims/graph/settings"><span class="glyphicon glyphicon-cog"></span></a></div>
+					<div><a href="#/ims/logout"><span class="glyphicon glyphicon-log-out"></span></a></div>
+				</div>
+			</div>
+
+			<div id="graphWrapper" class="full" sigmagraph gr='{{graph}}'></div>
+
+			<div id="search-box">
+				<table width="100%"><tr>
+					<td width="100%">
+						<table width="100%"><tr>
+							<td width="100%">
+								<input type="text" placeholder="Введите запрос" ng-model="tag.name">
+							</td><td>
+								<a ng-show="tag.name" href="" ng-click="getFiles({}, 0)"><span class="glyphicon glyphicon-remove"></span></a>
+							</td><td>
+								<a href=""><span class="glyphicon glyphicon-chevron-down"></span></a>
+							</td><td>
+								<a href="" ng-click="getFiles({name: tag.name}, 0)" class="with-left-border"><span class="glyphicon glyphicon-search"></span></a>
+							</td>
+						</tr></table>
+					</td>
+					<td>
+						<a href="" ng-class="{active: showTimeFilter}" ng-click="showTimeFilter=!showTimeFilter"><span class="glyphicon glyphicon-time"></span></a>
+					</td>
+					<td>
+						<a href="" ng-class="{active: showSortOptions}" ng-click="showSortList()"><span class="glyphicon glyphicon-sort"></span></a>
+					</td>
+				</tr></table>
+				<div ng-show="showTimeFilter" id="time-filtering-options">
+					<label for="since">C</label>
+					<select id="since">
+						<option>20.10.2011</option>
+					</select>
+					<label for="to">по</label>
+					<select id="to">
+						<option>20.10.2012</option>
+					</select>
+				</div>
+				<div ng-show="showSortOptions" id="sorting-options">
+					<label for="sortingField">Сортировать по</label>
+					<select id="sortingField" ng-change="applySort()" ng-model="sort.field"
+							ng-options="item.id as item.label for item in sortValues">
+					</select>
+					<label for="sortingOrder"><input id="sortingOrder" type="checkbox" ng-change="applySort()" ng-model="sort.desc"> в обратном порядке</label>
+				</div>
+			</div>
+
+			<div id="filelist" ng-class="{singleOffset: showSortOptions || showTimeFilter, doubleOffset: showSortOptions && showTimeFilter}">
+				<table class="file-info" ng-repeat="file in filelist"><tr>
+					<td>
+						<span class="glyphicon file-icon" ng-class="getClassByFileName(file.meta.title)"></span>
+					</td>
+					<td width="100%">
+						<h4>{{file.meta.title || file.guid}}</h4>
+						<div class="created">{{file.created | date:'medium'}}</div>
+            <div class="highlight" ng-bind-html="deliberatelyTrustDangerousSnippet(file.highlight)"></div>
+						<span class="label label-default" ng-repeat="tag in file.meta.tags" ng-style="{background_color: tag.color}" ng-click="getFiles(tag, 0)">{{tag.name}}</span>
+					</td>
+					<td>
+						<span class="glyphicon glyphicon-pencil"></span>
+					</td>
+				</tr></table>
+				<div id="load-more-wrapper" ng-hide="loaded">
+					<button class="btn btn-block btn-default" ng-click="loadMore()">Загрузить еще</button>
+				</div>
+			</div>
+
+			<div class="full modal-wrapper" ui-view name="mainContent"></div>
+		</script>
+
+		<script id="filelist.html" type="text/ng-template"></script>
+
+		<script id="graphdir.html" type="text/ng-template">
+			<div id="graph"></div>
+		</script>
+
+        <script id="sigmagraphdir.html" type="text/ng-template">
+            <div id="sigmagraph"></div>
+        </script>
+
+		<script id="upload.html" type="text/ng-template">
+			<div class="overlay">
+				<form role="form" ng-submit="upload()" class="content form-horizontal">
+					<div class="form-group">
+						<h1 class="col-md-9 col-md-offset-3">Загрузка файла</h1>
+
+                        <p style="color:red">{{errors}}</p>
+
+                        <div class="form-group">
+                            <label for="name" class="control-label col-md-3 col-md-offset-3">Название *</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="name" ng-model="file.meta.title">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tags" class="control-label col-md-3 col-md-offset-3">Теги через запятую *</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="tags" ng-model="file.meta.tags">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="file" class="control-label col-md-3 col-md-offset-3">Файл</label>
+                            <div class="col-md-3">
+                                <input type="file" id="file" ng-file-select="onFileSelect($files)">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-6 col-md-6">
+                                <input type="submit" class="btn btn-default btn-success" value="Сохранить"/>
+                            </div>
+                        </div>
+					</div>
+				</form>
+			</div>
+		</script>
+
+		<script id="create.html" type="text/ng-template">
+			<div class="overlay">
+				<form role="form" ng-submit="submit()" class="content form-horizontal">
+					<div class="form-group">
+						<h1 class="col-md-9 col-md-offset-3">Создание файла</h1>
+					</div>
+				</form>
+			</div>
+		</script>
+
+		<script id="activity.html" type="text/ng-template">
+			<div class="overlay">
+				<div class="content">
+					<h1 class="col-md-9 col-md-offset-3">Последние действия</h1>
+				</div>
+			</div>
+		</script>
+
+		<script id="info.html" type="text/ng-template">
+			<div class="overlay">
+				<div class="content">
+					<h1 class="col-md-9 col-md-offset-3">О проекте</h1>
+				</div>
+			</div>
+		</script>
+
+		<script id="graph-settings.html" type="text/ng-template">
+			<div class="overlay">
+				<form role="form" ng-submit="submit()" class="content form-horizontal">
+
+					<div class="form-group">
+						<h1 class="col-md-9 col-md-offset-3">Настройки графа</h1>
+					</div>
+
+					<p style="color:red">{{errors}}</p>
+
+					<div class="form-group">
+						<label for="minDiam" class="control-label col-md-3 col-md-offset-3">Мин. диаметр круга</label>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="minDiam" ng-model="settings.minDiam">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="c1" class="control-label col-md-3 col-md-offset-3">Коэф. диаметра круга</label>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="c1" ng-model="settings.c1">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="minPow" class="control-label col-md-3 col-md-offset-3">Мин. сила притяжения узлов</label>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="minPow" ng-model="settings.minPow">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="c2" class="control-label col-md-3 col-md-offset-3">Коэф. силы притяжения узлов</label>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="c2" ng-model="settings.c2">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="minLength" class="control-label col-md-3 col-md-offset-3">Мин. длина связи</label>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="minLength" ng-model="settings.minLength">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="c3" class="control-label col-md-3 col-md-offset-3">Коэф. длины связи</label>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="c3" ng-model="settings.c3">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-md-offset-6 col-md-6">
+							<input type="submit" class="btn btn-default btn-success" value="Сохранить"/>
+						</div>
+					</div>
+				</form>
+			</div>
+		</script>
+
+	</body>
+</html>
